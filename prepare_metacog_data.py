@@ -21,6 +21,8 @@ def main(data_path='data/chatglm_answers.jsonl',lora_path='data/small',save_path
     train_paths = [f"{lora_path}/train/{dirname}/answer.jsonl" for dirname in train_dirnames]
     test_paths = [f"{lora_path}/test/{dirname}/answer.jsonl" for dirname in test_dirnames]
     all_paths = train_paths + test_paths
+    hal_range = [j for j in range(16000) if data[j]["evaluate"] in ['C','D']]
+    nonhal_range = [j for j in range(16000) if data[j]["evaluate"] in ['A','B','E']]
     for path in all_paths:
         with jsonlines.open(path,'r') as reader:
             lora_num = int(path.split('/')[-2])
@@ -31,7 +33,10 @@ def main(data_path='data/chatglm_answers.jsonl',lora_path='data/small',save_path
                 sample_range = [j for j in train_range if j not in range(100*lora_num,100*(lora_num+1))]
             else:
                 sample_range = [j for j in test_range if j not in range(100*lora_num,100*(lora_num+1))]
-            random_number = random.sample(sample_range, 100)
+            sample_range_hal = [j for j in sample_range if j in hal_range]
+            sample_range_nonhal = [j for j in sample_range if j in nonhal_range]
+            random_number = random.sample(sample_range_hal, 80)
+            random_number += random.sample(sample_range_nonhal, 20)
             for j in random_number:
                 item={"lora_number":lora_num,"context":data[j]["context"],"evaluate":data[j]["evaluate"]}
                 data.append(item)
