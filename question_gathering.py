@@ -10,7 +10,7 @@ h = {
     'Content-Type': 'application/json',
     'Authorization': 'Bearer ' + key
 }
-N = 500
+N = 100
 M = 20
 
 def gen_prompt(topic, examples):
